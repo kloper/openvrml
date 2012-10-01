@@ -68,7 +68,7 @@ namespace {
         using openvrml::local::throw_runtime_error_from_win32_system_error;
 
         LONG result;
-        static DWORD * const reserved;
+        static DWORD * const reserved = NULL;
         DWORD type;
         std::vector<BYTE> data(64);
         DWORD size = data.size();
@@ -86,7 +86,7 @@ namespace {
             throw_runtime_error_from_win32_system_error(result);
         }
 
-        _ASSERTE(type == REG_SZ);
+        // _ASSERTE(type == REG_SZ);
 
         return std::string(&data.front(), &data.front() + size - 1);
     }

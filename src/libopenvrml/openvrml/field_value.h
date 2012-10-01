@@ -46,7 +46,7 @@ namespace openvrml {
         operator<<(std::ostream & out, const field_value & value);
 
     protected:
-        class counted_impl_base {
+        class OPENVRML_API counted_impl_base {
         public:
             virtual ~counted_impl_base() OPENVRML_NOTHROW;
             std::auto_ptr<counted_impl_base> clone() const

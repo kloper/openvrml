@@ -33,7 +33,7 @@ namespace openvrml_node_x3d_rendering {
         static const char * const id;
 
         explicit color_rgba_metatype(openvrml::browser & browser);
-        virtual ~color_rgba_metatype() throw ();
+        virtual ~color_rgba_metatype() OPENVRML_NOTHROW;
 
     private:
         virtual const boost::shared_ptr<openvrml::node_type>

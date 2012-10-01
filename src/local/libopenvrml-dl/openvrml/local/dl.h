@@ -24,6 +24,9 @@
 #   include <openvrml-common.h>
 #   ifdef _WIN32
 #     include <windows.h>
+#     if defined(__MINGW32__) || defined(__MINGW64__)
+#        include <winbase.h>
+#     endif
 #   else
 #     include <ltdl.h>
 #   endif

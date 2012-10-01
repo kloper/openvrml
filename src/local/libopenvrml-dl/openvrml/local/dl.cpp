@@ -164,7 +164,7 @@ int openvrml::local::dl::close(handle h)
 void * openvrml::local::dl::sym(handle h, const std::string & name)
 {
 # ifdef _WIN32
-    return GetProcAddress(h, name.c_str());
+return (void*)GetProcAddress(h, name.c_str());
 # else
     return lt_dlsym(h, name.c_str());
 # endif

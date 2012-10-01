@@ -34,7 +34,7 @@ namespace openvrml_node_x3d_texturing {
         static const char * const id;
 
         explicit multi_texture_metatype(openvrml::browser & browser);
-        virtual ~multi_texture_metatype() throw ();
+        virtual ~multi_texture_metatype() OPENVRML_NOTHROW;
 
     private:
         virtual const boost::shared_ptr<openvrml::node_type>

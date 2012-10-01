@@ -37,7 +37,7 @@
 # include <algorithm>
 # include <functional>
 # include <cerrno>
-# ifdef _WIN32
+# if defined(_WIN32) && !(defined(__MINGW32__) or defined(__MINGW64__))
 #   include <sys/timeb.h>
 #   include <direct.h>
 #   include <time.h>
@@ -1396,7 +1396,7 @@ openvrml::node_metatype_registry::register_node_metatype(
  */
 double openvrml::browser::current_time() OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if defined(_WIN32) && !(defined(__MINGW32__) or defined(__MINGW64__))
     _timeb timebuffer;
 #   if defined(_MSC_VER) && (_MSC_VER < 1400)
     _ftime(&timebuffer);

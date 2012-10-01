@@ -22,9 +22,9 @@
 #   define OPENVRML_LOCAL_XML_READER_H
 
 #   include <openvrml-common.h>
-#   ifdef _WIN32
+#   if (defined(_WIN32) && !defined(HAVE_LIBXML2))
 #     include <XmlLite.h>
-#   else
+#   elif defined(HAVE_LIBXML2)
 #     include <libxml/xmlreader.h>
 #   endif
 #   include <string>
@@ -43,10 +43,10 @@ namespace openvrml {
          * XmlReader API.
          */
         class OPENVRML_LOCAL xml_reader {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
             IStream * input;
             IXmlReader * reader;
-# else
+# elif defined(HAVE_LIBXML2)
             xmlTextReaderPtr reader;
 # endif
         public:

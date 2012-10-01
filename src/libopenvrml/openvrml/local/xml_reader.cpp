@@ -117,12 +117,12 @@
  */
 openvrml::local::xml_reader::xml_reader(const std::string & filename)
     OPENVRML_THROW1(std::runtime_error):
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     input(0),
 # endif
     reader(0)
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     HRESULT hr;
     bool succeeded = false;
 
@@ -151,7 +151,7 @@ openvrml::local::xml_reader::xml_reader(const std::string & filename)
     }
 
     succeeded = true;
-# else
+# elif defined(HAVE_LIBXML2)
     static const char * const encoding = 0;
     static const int options = 0;
     this->reader = xmlReaderForFile(filename.c_str(), encoding, options);
@@ -166,10 +166,10 @@ openvrml::local::xml_reader::xml_reader(const std::string & filename)
  */
 openvrml::local::xml_reader::~xml_reader() OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     this->reader->Release();
     this->input->Release();
-# else
+# elif defined(HAVE_LIBXML2)
     xmlFreeTextReader(this->reader);
 # endif
 }
@@ -183,14 +183,14 @@ openvrml::local::xml_reader::~xml_reader() OPENVRML_NOTHROW
  */
 int openvrml::local::xml_reader::read() OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     HRESULT hr = this->reader->Read(0);
     return (hr == S_OK)
         ? 1
         : (hr == S_FALSE)
             ? 0
             : -1;
-# else
+# elif defined(HAVE_LIBXML2)
     return xmlTextReaderRead(this->reader);
 # endif
 }
@@ -203,11 +203,11 @@ int openvrml::local::xml_reader::read() OPENVRML_NOTHROW
 openvrml::local::xml_reader::node_type_id
 openvrml::local::xml_reader::node_type() const OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     XmlNodeType type;
     this->reader->GetNodeType(&type);
     return node_type_id(type);
-# else
+# elif defined(HAVE_LIBXML2)
     return node_type_id(xmlTextReaderNodeType(this->reader));
 # endif
 }
@@ -223,14 +223,14 @@ openvrml::local::xml_reader::node_type() const OPENVRML_NOTHROW
 const std::string openvrml::local::xml_reader::local_name() const
     OPENVRML_THROW2(std::runtime_error, std::bad_alloc)
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     const WCHAR * name;
     HRESULT hr = this->reader->GetLocalName(&name, 0);
     if (FAILED(hr)) {
         throw std::runtime_error("failed to get element name");
     }
     return std::string(name, name + wcslen(name));
-# else
+# elif defined(HAVE_LIBXML2)
     const xmlChar * name = xmlTextReaderConstLocalName(this->reader);
     return std::string(name, name + xmlStrlen(name));
 # endif
@@ -247,14 +247,14 @@ const std::string openvrml::local::xml_reader::local_name() const
 const std::string openvrml::local::xml_reader::value() const
     OPENVRML_THROW2(std::runtime_error, std::bad_alloc)
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     const WCHAR * val;
     HRESULT hr = this->reader->GetValue(&val, 0);
     if (FAILED(hr)) {
         throw std::runtime_error("failed to get a value");
     }
     return std::string(val, val + wcslen(val));
-# else
+# elif defined(HAVE_LIBXML2)
     const xmlChar * val = xmlTextReaderConstValue(this->reader);
     return std::string(val, val + xmlStrlen(val));
 # endif
@@ -269,14 +269,14 @@ const std::string openvrml::local::xml_reader::value() const
  */
 int openvrml::local::xml_reader::move_to_first_attribute() OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     HRESULT hr = this->reader->MoveToFirstAttribute();
     return (hr == S_OK)
         ? 1
         : (hr == S_FALSE)
             ? 0
             : -1;
-# else
+# elif defined(HAVE_LIBXML2)
     return xmlTextReaderMoveToFirstAttribute(this->reader);
 # endif
 }
@@ -290,14 +290,14 @@ int openvrml::local::xml_reader::move_to_first_attribute() OPENVRML_NOTHROW
  */
 int openvrml::local::xml_reader::move_to_next_attribute() OPENVRML_NOTHROW
 {
-# ifdef _WIN32
+# if (defined(_WIN32) && !defined(HAVE_LIBXML2))
     HRESULT hr = this->reader->MoveToNextAttribute();
     return (hr == S_OK)
         ? 1
         : (hr == S_FALSE)
             ? 0
             : -1;
-# else
+# elif defined(HAVE_LIBXML2)
     return xmlTextReaderMoveToNextAttribute(this->reader);
 # endif
 }
