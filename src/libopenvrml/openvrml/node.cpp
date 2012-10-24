@@ -3162,7 +3162,6 @@ openvrml::bounded_volume_node::do_bounding_volume() const
     public:
         default_bounding_volume()
         {
-            this->maximize();
         }
     };
 
