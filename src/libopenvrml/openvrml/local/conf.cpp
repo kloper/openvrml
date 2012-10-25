@@ -125,7 +125,7 @@ const boost::filesystem::path openvrml::local::conf::datadir()
     try {
         result = get_env("OPENVRML_DATADIR");
     } catch (const no_environment_var &) {
-# ifdef _WIN32
+# if defined(_WIN32) && !defined(OPENVRML_PKGDATADIR_)
         result = get_registry_setting("Datadir");
 # else
         result = OPENVRML_PKGDATADIR_;
@@ -193,7 +193,7 @@ const std::vector<boost::filesystem::path> openvrml::local::conf::node_path()
          back_inserter(result));
 
     std::string system_path;
-# ifdef _WIN32
+# if defined(_WIN32) && !defined(OPENVRML_PKGLIBDIR_)
     try {
         system_path = get_registry_setting("NodePath");
     } catch (no_registry_key &) {}
@@ -229,7 +229,7 @@ const std::vector<boost::filesystem::path> openvrml::local::conf::script_path()
          back_inserter(result));
 
     std::string system_path;
-# ifdef _WIN32
+# if defined(_WIN32) && !defined(OPENVRML_PKGLIBDIR_)
     try {
         system_path = get_registry_setting("ScriptPath");
     } catch (no_registry_key &) {}
