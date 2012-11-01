@@ -29,6 +29,8 @@
 #   include <openvrml/scope.h>
 #   include <stack>
 
+#include <dgd.h>
+
 namespace openvrml {
 
     namespace local {
@@ -87,6 +89,7 @@ namespace openvrml {
 
             ~vrml97_parse_actions()
             {
+                dgd_scope;
                 //
                 // If the parse scope stack is not empty, we must have hit a
                 // parse error.  Since all inner scopes are associated with
@@ -163,6 +166,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     using std::vector;
                     using boost::intrusive_ptr;
 
@@ -190,6 +195,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     using std::vector;
 
                     assert(this->actions_.ps.top().children.size() == 1);
@@ -236,6 +243,8 @@ namespace openvrml {
                                 const node_interface_set & interfaces,
                                 const std::vector<std::string> & uri_list) const
                 {
+                    dgd_scope;
+
                     using std::string;
                     using std::vector;
                     using boost::shared_ptr;
@@ -333,6 +342,8 @@ namespace openvrml {
 
                 void operator()(const std::string & node_type_id) const
                 {
+                    dgd_scope;
+
                     const boost::shared_ptr<scope> outer_scope =
                         this->actions_.ps.top().scope;
                     assert(outer_scope);
@@ -368,6 +379,8 @@ namespace openvrml {
 
                 void operator()(const node_interface & interface_) const
                 {
+                    dgd_scope;
+
                     parse_scope & ps = this->actions_.ps.top();
 
                     const bool succeeded =
@@ -405,6 +418,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     parse_scope & ps = this->actions_.ps.top();
 
                     boost::shared_ptr<scope> outer_scope = ps.scope;
@@ -447,6 +462,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
 
                     parse_scope & ps = this->actions_.ps.top();
@@ -495,6 +512,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     const boost::shared_ptr<scope> parent =
                         actions_.ps.top().scope;
@@ -520,6 +539,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     using std::vector;
                     using boost::shared_ptr;
                     using boost::dynamic_pointer_cast;
@@ -599,6 +620,11 @@ namespace openvrml {
                 void operator()(const std::string & node_name_id,
                                 const std::string & node_type_id) const
                 {
+                    dgd_scope;
+
+                    dgd_echo(node_name_id);
+                    dgd_echo(node_type_id);
+
                     parse_scope & ps = this->actions_.ps.top();
 
                     ps.node_data_.push(node_data());
@@ -628,6 +654,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     using boost::intrusive_ptr;
 
                     parse_scope & ps = this->actions_.ps.top();
@@ -675,6 +703,8 @@ namespace openvrml {
 
                 void operator()(const node_interface & interface_) const
                 {
+                    dgd_scope;
+
                     parse_scope & ps = this->actions_.ps.top();
 
                     assert(!ps.node_data_.empty());
@@ -710,6 +740,8 @@ namespace openvrml {
                                 const std::string & to_node_name_id,
                                 const node_interface & to_node_interface) const
                 {
+                    dgd_scope;
+
                     parse_scope & ps = this->actions_.ps.top();
                     const route r(from_node_name_id, from_node_interface.id,
                                   to_node_name_id, to_node_interface.id);
@@ -727,6 +759,8 @@ namespace openvrml {
 
                 void operator()(const std::string & node_name_id) const
                 {
+                    dgd_scope;
+
                     using boost::intrusive_ptr;
                     parse_scope & ps = this->actions_.ps.top();
                     node_data & nd = ps.node_data_.top();
@@ -754,6 +788,8 @@ namespace openvrml {
 
                 void operator()(const std::string & proto_interface_id) const
                 {
+                    dgd_scope;
+
                     node_data & nd =
                         this->actions_.ps.top().node_data_.top();
                     assert(nd.current_field_value);
@@ -791,6 +827,11 @@ namespace openvrml {
                 void operator()(const std::string & field_name_id,
                                 const field_value::type_id field_type) const
                 {
+                    dgd_scope;
+
+                    dgd_echo(field_name_id);
+                    dgd_echo(field_type);
+
                     parse_scope & ps = this->actions_.ps.top();
                     node_data & nd = ps.node_data_.top();
 
@@ -822,6 +863,8 @@ namespace openvrml {
 
                 void operator()(bool null) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     parse_scope & ps = this->actions_.ps.top();
 
@@ -846,6 +889,8 @@ namespace openvrml {
 
                 void operator()() const
                 {
+                    dgd_scope;
+
                     assert(!this->actions_.ps.empty());
                     parse_scope & ps = this->actions_.ps.top();
 
@@ -867,6 +912,8 @@ namespace openvrml {
 
                 void operator()(const bool val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -884,6 +931,8 @@ namespace openvrml {
 
                 void operator()(const color & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -901,6 +950,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<color> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -918,6 +969,8 @@ namespace openvrml {
 
                 void operator()(const float val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -935,6 +988,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<float> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -952,6 +1007,8 @@ namespace openvrml {
 
                 void operator()(const image & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -969,6 +1026,8 @@ namespace openvrml {
 
                 void operator()(const int32 val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -986,6 +1045,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<int32> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1003,6 +1064,8 @@ namespace openvrml {
 
                 void operator()(const rotation & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1020,6 +1083,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<rotation> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1037,6 +1102,8 @@ namespace openvrml {
 
                 void operator()(const std::string & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1054,6 +1121,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<std::string> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1071,6 +1140,8 @@ namespace openvrml {
 
                 void operator()(const double val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1088,6 +1159,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<double> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1105,6 +1178,8 @@ namespace openvrml {
 
                 void operator()(const vec2f & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1122,6 +1197,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<vec2f> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1139,6 +1216,8 @@ namespace openvrml {
 
                 void operator()(const vec3f & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1156,6 +1235,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<vec3f> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1295,6 +1376,8 @@ namespace openvrml {
 
                 void operator()(const std::string & profile_id) const
                 {
+                    dgd_scope;
+
                     using std::vector;
                     using boost::intrusive_ptr;
 
@@ -1323,7 +1406,9 @@ namespace openvrml {
 
                 void operator()(const std::string & /* component_id */,
                                 int32 /* level */) const
-                {}
+                {
+                    dgd_scope;
+                }
 
             private:
                 x3d_vrml_parse_actions & actions_;
@@ -1337,6 +1422,8 @@ namespace openvrml {
                 void operator()(const std::string & name,
                                 const std::string & value) const
                 {
+                    dgd_scope;
+
                     this->actions_.meta_[name] = value;
                 }
 
@@ -1349,14 +1436,18 @@ namespace openvrml {
                 operator()(const std::string & /* inline_node_name_id */,
                            const std::string & /* exported_node_name_id */,
                            const std::string & /* imported_node_name_id */) const
-                {}
+                {
+                    dgd_scope;
+                }
             } on_import_statement;
 
             struct on_export_statement_t {
                 void
                 operator()(const std::string & /* node_name_id */,
                            const std::string & /* exported_node_name_id */) const
-                {}
+                {
+                    dgd_scope;
+                }
             } on_export_statement;
 
             struct on_sfcolorrgba_t {
@@ -1366,6 +1457,8 @@ namespace openvrml {
 
                 void operator()(const color_rgba & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1383,6 +1476,8 @@ namespace openvrml {
 
                 void operator()(const double val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1400,6 +1495,8 @@ namespace openvrml {
 
                 void operator()(const vec2d & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1417,6 +1514,8 @@ namespace openvrml {
 
                 void operator()(const vec3d & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1434,6 +1533,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<bool> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1451,6 +1552,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<color_rgba> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1468,6 +1571,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<double> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1485,6 +1590,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<image> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1502,6 +1609,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<vec2d> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
@@ -1519,6 +1628,8 @@ namespace openvrml {
 
                 void operator()(const std::vector<vec3d> & val) const
                 {
+                    dgd_scope;
+
                     assert(!actions_.ps.empty());
                     assert(!actions_.ps.top().node_data_.empty());
                     actions_.ps.top().node_data_.top()
