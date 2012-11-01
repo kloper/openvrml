@@ -124,8 +124,10 @@ namespace openvrml {
                             const field_value::type_id current_field_type =
                                 nd.current_field_value->second->type();
                             if (current_field_type == field_value::sfnode_id) {
-                                nd.current_field_value->second->assign(
-                                    sfnode(ps.children.top().front()));
+                                if( ps.children.size() > 0 && 
+                                    ps.children.top().size() > 0 )
+                                    nd.current_field_value->second->assign(
+                                        sfnode(ps.children.top().front()));
                             } else if (current_field_type
                                        == field_value::mfnode_id) {
                                 nd.current_field_value->second->assign(
@@ -1255,7 +1257,7 @@ namespace openvrml {
             //
             std::stack<parse_scope> ps;
 
-        private:
+        protected:
             const std::string uri_;
             const openvrml::scene & scene_;
             std::vector<boost::intrusive_ptr<openvrml::node> > & nodes_;
@@ -1291,8 +1293,23 @@ namespace openvrml {
                     actions_(actions)
                 {}
 
-                void operator()(const std::string & /* profile_id */) const
-                {}
+                void operator()(const std::string & profile_id) const
+                {
+                    using std::vector;
+                    using boost::intrusive_ptr;
+
+                    this->actions_.ps.push(parse_scope());
+
+                    const profile & p =
+                        local::profile_registry_.at(profile_id);
+                    std::auto_ptr<scope>
+                        root_scope(
+                            p.create_root_scope(this->actions_.scene_.browser(),
+                                                this->actions_.uri_));
+                    this->actions_.ps.top().scope = root_scope;
+                    this->actions_.ps.top().children.push(
+                        parse_scope::children_t());
+                }
 
             private:
                 x3d_vrml_parse_actions & actions_;
