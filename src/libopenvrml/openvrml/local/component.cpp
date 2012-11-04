@@ -28,6 +28,8 @@
 # include <iostream>
 # include <cstring>
 
+#include <dgd.h>
+
 class openvrml::local::component::xml_reader : boost::noncopyable {
     enum parse_state {
         none,
@@ -256,9 +258,13 @@ openvrml::local::component::add_scope_entry(
     openvrml::scope & scope) const
     OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_alloc)
 {
+    dgd_scope;
+
     using boost::shared_ptr;
     using openvrml::node_metatype;
     using openvrml::node_type;
+
+    dgd_echo(urn);
 
     const shared_ptr<node_metatype> class_ = b.node_metatype(urn);
     assert(class_);
