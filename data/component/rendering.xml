@@ -28,13 +28,14 @@
       <field id="colorPerVertex"    type="SFBool"  access-type="initializeOnly" />
       <field id="coordIndex"        type="MFInt32" access-type="initializeOnly" />
     </node>
-    <node id="LineSet"
+<!--    <node id="LineSet"
           metatype-id="urn:X-openvrml:node:LineSet">
       <field id="metadata"    type="SFNode"  access-type="inputOutput" />
       <field id="color"       type="SFNode"  access-type="inputOutput" />
       <field id="coord"       type="SFNode"  access-type="inputOutput" />
       <field id="vertexCount" type="MFInt32" access-type="inputOutput" />
     </node>
+-->
     <node id="PointSet"
           metatype-id="urn:X-openvrml:node:PointSet">
       <field id="metadata"    type="SFNode"  access-type="inputOutput" />
