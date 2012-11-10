@@ -44,12 +44,15 @@ namespace {
         openvrml::sfbool top;
         openvrml::sfbool solid_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         cylinder_node(const openvrml::node_type & type,
                       const boost::shared_ptr<openvrml::scope> & scope);
         virtual ~cylinder_node() OPENVRML_NOTHROW;
 
     private:
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
         virtual void do_render_geometry(openvrml::viewer & viewer,
                                         openvrml::rendering_context context);
     };
@@ -115,7 +118,9 @@ namespace {
         side(true),
         top(true),
         solid_(true)
-    {}
+    {
+        this->bounding_volume_dirty(true); // lazy calc of bvolume
+    }
 
     /**
      * @brief Destroy.
@@ -141,6 +146,25 @@ namespace {
                                this->side.value(),
                                this->top.value());
     }
+
+    /**
+     * @brief Get the bounding volume.
+     *
+     * @return the bounding volume associated with the node.
+     */
+    const openvrml::bounding_volume &
+    cylinder_node::do_bounding_volume() const
+    {
+        if (this->bounding_volume_dirty()) {
+            float h = height.value();
+            float r = radius.value();
+            float bounding_radius = std::sqrt(h*h + r*r);
+            const_cast<cylinder_node *>(this)->bsphere.radius(bounding_radius);
+            const_cast<cylinder_node *>(this)->bounding_volume_dirty(false); 
+        }
+        return this->bsphere;
+    }
+
 }
 
 

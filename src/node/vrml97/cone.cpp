@@ -42,12 +42,15 @@ namespace {
         openvrml::sfbool side;
         openvrml::sfbool solid_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         cone_node(const openvrml::node_type & type,
                   const boost::shared_ptr<openvrml::scope> & scope);
         virtual ~cone_node() OPENVRML_NOTHROW;
 
     private:
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
         virtual void do_render_geometry(openvrml::viewer & viewer,
                                         openvrml::rendering_context context);
     };
@@ -106,7 +109,9 @@ namespace {
         height(2.0),
         side(true),
         solid_(true)
-    {}
+    {
+        this->bounding_volume_dirty(true); // lazy calc of bvolume
+    }
 
     /**
      * @brief Destroy.
@@ -129,6 +134,28 @@ namespace {
                            this->bottom.value(),
                            this->side.value());
     }
+
+    /**
+     * @brief Get the bounding volume.
+     *
+     * @return the bounding volume associated with the node.
+     */
+    const openvrml::bounding_volume &
+    cone_node::do_bounding_volume() const
+    {
+        if (this->bounding_volume_dirty()) {
+            float h = height.value();
+            float r = bottomRadius.value();
+            float bounding_radius = (h*h + r*r) / (2.0*h);
+            const openvrml::vec3f bounding_center =
+                openvrml::make_vec3f(0, h/2.0 - bounding_radius, 0);
+            const_cast<cone_node *>(this)->bsphere.radius(bounding_radius);
+            const_cast<cone_node *>(this)->bsphere.center(bounding_center);
+            const_cast<cone_node *>(this)->bounding_volume_dirty(false); 
+        }
+        return this->bsphere;
+    }
+
 }
 
 
