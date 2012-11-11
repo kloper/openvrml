@@ -64,6 +64,8 @@ namespace {
         openvrml::sfint32 z_dimension_;
         openvrml::sffloat z_spacing_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         elevation_grid_node(const openvrml::node_type & type,
                             const boost::shared_ptr<openvrml::scope> & scope);
@@ -75,6 +77,7 @@ namespace {
 
         virtual void do_render_geometry(openvrml::viewer & viewer,
                                         openvrml::rendering_context context);
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
     };
 
     /**
@@ -135,7 +138,7 @@ namespace {
 
             elevation_grid.height_ = height;
             elevation_grid.node::modified(true);
-
+            elevation_grid.bounding_volume_dirty(true); 
         } catch (std::bad_cast & ex) {
             OPENVRML_PRINT_EXCEPTION_(ex);
         }
@@ -250,7 +253,9 @@ namespace {
         x_spacing_(1.0f),
         z_dimension_(0),
         z_spacing_(1.0f)
-    {}
+    {
+        this->bounding_volume_dirty(true); // lazy calc of bvolume
+    }
 
     /**
      * @brief Destroy.
@@ -345,6 +350,51 @@ namespace {
         if (normalNode) { normalNode->modified(false); }
         if (texCoordNode) { texCoordNode->modified(false); }
     }
+
+    /**
+     * @brief Get the bounding volume.
+     *
+     * @return the bounding volume associated with the node.
+     */
+    const openvrml::bounding_volume &
+    elevation_grid_node::do_bounding_volume() const
+    {
+        if (this->bounding_volume_dirty()) {
+            bool y_defined = false;
+            float min_y, max_y;
+
+            const std::vector<float>& heights = this->height_.value(); 
+            for( std::vector<float>::const_iterator iter = heights.begin();
+                 iter != heights.end();
+                 ++iter ) {
+                if( !y_defined || max_y < *iter ) {
+                    max_y = *iter;
+                    y_defined = true;
+                }
+                if( !y_defined || min_y > *iter ) {
+                    min_y = *iter;
+                    y_defined = true;
+                }
+            }
+
+            float max_x = this->x_spacing_.value() * this->x_dimension_.value();
+            float max_z = this->z_spacing_.value() * this->z_dimension_.value();
+
+            openvrml::vec3f bottom = 
+                openvrml::make_vec3f( 0, y_defined ? min_y : 0, 0 );
+            openvrml::vec3f top = 
+                openvrml::make_vec3f( max_x, y_defined ? max_y : 0, max_z );
+
+            const_cast<elevation_grid_node *>(this)->
+                bsphere.radius((top-bottom).length() / 2.0f);
+            const_cast<elevation_grid_node *>(this)->
+                bsphere.center((top + bottom) / 2.0f);
+            const_cast<elevation_grid_node *>(this)->
+                bounding_volume_dirty(false); 
+        }
+        return this->bsphere;
+    }
+
 }
 
 
