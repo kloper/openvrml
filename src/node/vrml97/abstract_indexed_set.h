@@ -75,6 +75,8 @@ namespace openvrml_node_vrml97 {
         openvrml::sfbool color_per_vertex_;
         openvrml::mfint32 coord_index_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         virtual ~abstract_indexed_set_node() OPENVRML_NOTHROW = 0;
 
@@ -87,6 +89,8 @@ namespace openvrml_node_vrml97 {
 
         virtual bool do_modified() const
             OPENVRML_THROW1(boost::thread_resource_error);
+
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
     };
 
     /**
@@ -250,7 +254,9 @@ namespace openvrml_node_vrml97 {
         color_(*this),
         coord_(*this),
         color_per_vertex_(true)
-    {}
+    {
+        this->bounding_volume_dirty(true); // lazy calc of bvolume
+    }
 
     /**
      * @brief Destroy.
@@ -258,7 +264,8 @@ namespace openvrml_node_vrml97 {
     template <typename Derived>
     abstract_indexed_set_node<Derived>::~abstract_indexed_set_node()
         OPENVRML_NOTHROW
-    {}
+    {
+    }
 
     /**
      * @brief Determine whether the node has been modified.
@@ -273,6 +280,63 @@ namespace openvrml_node_vrml97 {
         return (this->color_.value() && this->color_.value()->modified())
             || (this->coord_.value() && this->coord_.value()->modified());
     }
+
+
+    /**
+     * @brief Get the bounding volume.
+     *
+     * @return the bounding volume associated with the node.
+     */
+    template <typename Derived>
+    const openvrml::bounding_volume &
+    abstract_indexed_set_node<Derived>::do_bounding_volume() const
+    {
+        if (this->bounding_volume_dirty()) {
+            openvrml::coordinate_node* const coordinateNode = 
+                openvrml::node_cast<openvrml::coordinate_node *>(
+                    this->coord_.value().get()
+                );
+            if (coordinateNode) {
+                typedef std::vector<openvrml::vec3f> coort_vec_t;
+                const coort_vec_t& coord = coordinateNode->point();
+
+                openvrml::vec3f top, bottom;
+                bool init = false;
+
+                for(coort_vec_t::const_iterator iter = coord.begin();
+                    iter != coord.end();
+                    ++iter) {                    
+                    if( !init || top.x() < iter->x() ) 
+                        top.x(iter->x());
+                    if( !init || top.y() < iter->y() ) 
+                        top.y(iter->y());
+                    if( !init || top.z() < iter->z() ) 
+                        top.z(iter->z());
+
+                    if( !init || bottom.x() > iter->x() ) 
+                        bottom.x(iter->x());
+                    if( !init || bottom.y() > iter->y() ) 
+                        bottom.y(iter->y());
+                    if( !init || bottom.z() > iter->z() ) 
+                        bottom.z(iter->z());
+                    init = true;
+                }
+                
+                const_cast< abstract_indexed_set_node<Derived> *>(this)->
+                    bsphere.center(
+                        (top+bottom) / 2.0f
+                    );
+                const_cast< abstract_indexed_set_node<Derived> *>(this)->
+                    bsphere.radius(
+                        (top-bottom).length() / 2.0f
+                    );
+                const_cast< abstract_indexed_set_node<Derived> *>(this)->
+                    bounding_volume_dirty(false); 
+            }
+        }
+        return this->bsphere;
+    }
+
 
     /**
      * @brief color_node.

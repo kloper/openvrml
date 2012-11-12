@@ -76,8 +76,6 @@ namespace {
         openvrml::sfbool solid_;
         openvrml::mfint32 tex_coord_index_;
 
-        openvrml::bounding_sphere bsphere;
-
     public:
         indexed_face_set_node(
             const openvrml::node_type & type,
@@ -88,11 +86,9 @@ namespace {
         virtual bool do_modified() const
             OPENVRML_THROW1(boost::thread_resource_error);
 
-        virtual const openvrml::bounding_volume & do_bounding_volume() const;
         virtual void do_render_geometry(openvrml::viewer & viewer,
                                         openvrml::rendering_context context);
 
-        void recalc_bsphere();
     };
 
     /**
@@ -276,12 +272,6 @@ namespace {
      */
 
     /**
-     * @var openvrml::bounding_sphere indexed_face_set_node::bsphere
-     *
-     * @brief Bounding volume.
-     */
-
-    /**
      * @brief Construct.
      *
      * @param type  the node_type associated with the node.
@@ -304,7 +294,6 @@ namespace {
         normal_per_vertex_(true),
         solid_(true)
     {
-        this->bounding_volume_dirty(true);
     }
 
     /**
@@ -412,45 +401,6 @@ namespace {
         if (coordinateNode) { coordinateNode->modified(false); }
         if (normalNode) { normalNode->modified(false); }
         if (texCoordNode) { texCoordNode->modified(false); }
-    }
-
-    /**
-     * @brief Recalculate the bounding volume.
-     */
-    void indexed_face_set_node::recalc_bsphere()
-    {
-        using openvrml::node_cast;
-        using openvrml::vec3f;
-
-        // take the bvolume of all the points. technically, we should figure
-        // out just which points are used by the index and just use those,
-        // but for a first pass this is fine (also: if we do it this way
-        // then we don't have to update the bvolume when the index
-        // changes). motto: always do it the simple way first...
-        //
-        openvrml::coordinate_node * const coordinateNode =
-            node_cast<openvrml::coordinate_node *>(
-                this->coord_.sfnode::value().get());
-        if (coordinateNode) {
-            const std::vector<vec3f> & coord = coordinateNode->point();
-            this->bsphere = openvrml::bounding_sphere();
-            this->bsphere.enclose(coord);
-        }
-        this->bounding_volume_dirty(false);
-    }
-
-    /**
-     * @brief Get the bounding volume.
-     *
-     * @return the bounding volume associated with the node.
-     */
-    const openvrml::bounding_volume &
-    indexed_face_set_node::do_bounding_volume() const
-    {
-        if (this->bounding_volume_dirty()) {
-            const_cast<indexed_face_set_node *>(this)->recalc_bsphere();
-        }
-        return this->bsphere;
     }
 }
 
