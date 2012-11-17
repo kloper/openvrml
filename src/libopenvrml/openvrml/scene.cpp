@@ -416,7 +416,7 @@ namespace {
         {
             this->listener_->stream_available(this->in_->url(),
                                               this->in_->type());
-            while (*this->in_) {
+            while (this->in_->good() && !this->in_->eof()) {
                 std::vector<unsigned char> data;
                 while (this->in_->data_available()) {
                     using openvrml::resource_istream;
