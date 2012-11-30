@@ -1178,7 +1178,7 @@ namespace openvrml {
     };
 
 
-    class OPENVRML_API navigation_info_node : public virtual child_node {
+    class OPENVRML_API navigation_info_node : public virtual node {
     public:
         virtual ~navigation_info_node() OPENVRML_NOTHROW = 0;
 
@@ -1380,7 +1380,7 @@ namespace openvrml {
     };
 
 
-    class OPENVRML_API viewpoint_node : public virtual child_node {
+    class OPENVRML_API viewpoint_node : public virtual node {
     public:
         virtual ~viewpoint_node() OPENVRML_NOTHROW = 0;
 

@@ -330,8 +330,6 @@ openvrml_node_vrml97::navigation_info_node::
 navigation_info_node(const openvrml::node_type & t,
                      const boost::shared_ptr<openvrml::scope> & scope):
     node(t, scope),
-    bounded_volume_node(t, scope),
-    child_node(t, scope),
     openvrml::node_impl_util::abstract_node<navigation_info_node>(t, scope),
     openvrml::navigation_info_node(t, scope),
     set_bind_listener_(*this),

@@ -533,8 +533,6 @@ openvrml_node_vrml97::viewpoint_node::
 viewpoint_node(const openvrml::node_type & type,
                const boost::shared_ptr<openvrml::scope> & scope):
     node(type, scope),
-    bounded_volume_node(type, scope),
-    child_node(type, scope),
     openvrml::node_impl_util::abstract_node<viewpoint_node>(type, scope),
     openvrml::viewpoint_node(type, scope),
     set_bind_listener_(*this),

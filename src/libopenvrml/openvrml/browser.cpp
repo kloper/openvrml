@@ -106,8 +106,6 @@ namespace {
     default_navigation_info(const openvrml::null_node_type & t)
         OPENVRML_NOTHROW:
         openvrml::node(t, null_scope_ptr),
-        openvrml::bounded_volume_node(t, null_scope_ptr),
-        openvrml::child_node(t, null_scope_ptr),
         openvrml::navigation_info_node(t, null_scope_ptr)
     {}
 
@@ -274,8 +272,6 @@ namespace {
     default_viewpoint::default_viewpoint(const openvrml::null_node_type & type)
         OPENVRML_NOTHROW:
         openvrml::node(type, null_scope_ptr),
-        openvrml::bounded_volume_node(type, null_scope_ptr),
-        openvrml::child_node(type, null_scope_ptr),
         openvrml::viewpoint_node(type, null_scope_ptr),
         userViewTransform(openvrml::make_mat4f())
     {}

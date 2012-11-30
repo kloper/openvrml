@@ -4510,9 +4510,7 @@ openvrml::navigation_info_node::
 navigation_info_node(const node_type & t,
                      const boost::shared_ptr<openvrml::scope> & scope)
     OPENVRML_NOTHROW:
-    node(t, scope),
-    bounded_volume_node(t, scope),
-    child_node(t, scope)
+    node(t, scope)
 {}
 
 /**
@@ -5256,9 +5254,7 @@ openvrml::viewpoint_node::
 viewpoint_node(const node_type & type,
                const boost::shared_ptr<openvrml::scope> & scope)
     OPENVRML_NOTHROW:
-    node(type, scope),
-    bounded_volume_node(type, scope),
-    child_node(type, scope)
+    node(type, scope)
 {}
 
 /**
