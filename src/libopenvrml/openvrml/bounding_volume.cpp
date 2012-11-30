@@ -19,7 +19,11 @@
 //
 
 # include <limits>
+
+# include <dgd.h>
+
 # include <openvrml/local/float.h>
+
 # include "bounding_volume.h"
 # include "field_value.h"
 # include "frustum.h"
@@ -377,6 +381,11 @@ openvrml::bounding_volume::intersection
 openvrml::bounding_sphere::
 do_intersect_frustum(const openvrml::frustum & frustum) const
 {
+    dgd_scope;
+
+    dgd_echo(this->radius_);
+    dgd_echo(this->maximized());
+
     if (this->maximized()) { return bounding_volume::partial; }
     if (this->radius_ == -1.0f) { return bounding_volume::partial; } // ???
 
@@ -394,6 +403,10 @@ do_intersect_frustum(const openvrml::frustum & frustum) const
     //
     float znear = -float(frustum.z_near);
     float d = znear - this->center_.z();
+
+    dgd_echo(znear);
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
@@ -403,6 +416,10 @@ do_intersect_frustum(const openvrml::frustum & frustum) const
     //
     float zfar = -float(frustum.z_far);
     d = this->center_.z() - zfar;
+
+    dgd_echo(zfar);
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
@@ -412,25 +429,37 @@ do_intersect_frustum(const openvrml::frustum & frustum) const
     // unlike the near/far planes we have to use the dot product.
     //
     d = sphere_plane_distance(*this, frustum.top_plane, frustum.top_plane[3]);
+
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
     d = sphere_plane_distance(*this, frustum.bot_plane, frustum.bot_plane[3]);
+
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
     d = sphere_plane_distance(*this,
                               frustum.left_plane,
                               frustum.left_plane[3]);
+
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
     d = sphere_plane_distance(*this,
                               frustum.right_plane,
                               frustum.right_plane[3]);
+    dgd_echo(d);
+
     if (d < -this->radius_) { return bounding_volume::outside; }
     if (d < this->radius_) { code = bounding_volume::partial; }
 
+    dgd_echo(code);
     return code;
 }
 
