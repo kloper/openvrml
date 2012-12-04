@@ -504,6 +504,9 @@ namespace openvrml {
         std::auto_ptr<field_value> field(const std::string & id) const
             OPENVRML_THROW2(unsupported_interface, std::bad_alloc);
 
+        void assign_field(const std::string & id, const field_value & value)
+            OPENVRML_THROW2(unsupported_interface, std::bad_cast);
+
         template <typename FieldValue>
         const FieldValue field(const std::string & id) const
             OPENVRML_THROW2(unsupported_interface, std::bad_cast);
@@ -545,8 +548,14 @@ namespace openvrml {
 
         virtual void do_initialize(double timestamp)
             OPENVRML_THROW1(std::bad_alloc);
+
         virtual const field_value & do_field(const std::string & id) const
             OPENVRML_THROW1(unsupported_interface) = 0;
+
+        virtual void do_assign_field(const std::string & id, 
+                                     const field_value & value)
+            OPENVRML_THROW2(unsupported_interface, std::bad_cast) = 0;
+
         virtual openvrml::event_listener &
         do_event_listener(const std::string & id)
             OPENVRML_THROW1(unsupported_interface) = 0;

@@ -65,9 +65,9 @@ namespace {
         virtual ~default_navigation_info() OPENVRML_NOTHROW;
 
     private:
-        virtual void do_field(const std::string & id,
-                              const openvrml::field_value & value)
-            OPENVRML_NOTHROW;
+        virtual void do_assign_field(const std::string & id,
+                                     const openvrml::field_value &value)
+            OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast);
         virtual const openvrml::field_value &
         do_field(const std::string & id) const
             OPENVRML_NOTHROW;
@@ -171,9 +171,9 @@ namespace {
         return 0.0;
     }
 
-    void default_navigation_info::do_field(const std::string &,
-                                           const openvrml::field_value &)
-        OPENVRML_NOTHROW
+    void default_navigation_info::do_assign_field(const std::string &,
+                                                  const openvrml::field_value &)
+        OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
     {
         assert(false);
     }
@@ -233,9 +233,9 @@ namespace {
         virtual ~default_viewpoint() OPENVRML_NOTHROW;
 
     private:
-        virtual void do_field(const std::string & id,
-                              const openvrml::field_value & value)
-            OPENVRML_NOTHROW;
+        virtual void do_assign_field(const std::string & id,
+                                     const openvrml::field_value & value)
+            OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast);
         virtual const openvrml::field_value &
         do_field(const std::string & id) const
             OPENVRML_NOTHROW;
@@ -329,9 +329,9 @@ namespace {
         return fieldOfView;
     }
 
-    void default_viewpoint::do_field(const std::string &,
-                                     const openvrml::field_value &)
-        OPENVRML_NOTHROW
+    void default_viewpoint::do_assign_field(const std::string &,
+                                            const openvrml::field_value &)
+        OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
     {
         assert(false);
     }

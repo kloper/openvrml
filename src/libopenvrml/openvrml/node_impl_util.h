@@ -170,6 +170,14 @@ namespace openvrml {
             field_value(const openvrml::node & node,
                         const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface) = 0;
+
+            virtual void
+            assign_field_value(openvrml::node & node,
+                               const std::string & id,
+                               const openvrml::field_value &value) const
+                OPENVRML_THROW2(openvrml::unsupported_interface, 
+                                std::bad_cast) = 0;
+
             virtual openvrml::event_listener &
             event_listener(openvrml::node & node, const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface) = 0;
@@ -304,6 +312,11 @@ namespace openvrml {
             field_value(const openvrml::node & node,
                         const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface);
+            virtual void
+            assign_field_value(openvrml::node & node,
+                               const std::string & id,
+                               const openvrml::field_value &value) const
+                OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast);
             virtual openvrml::event_listener &
             event_listener(openvrml::node & node, const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface);
@@ -324,6 +337,14 @@ namespace openvrml {
             const openvrml::field_value &
             do_field_value(const Node & node, const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface);
+
+            void
+            do_assign_field_value(Node & node, 
+                                  const std::string & id,
+                                  const openvrml::field_value &value) const
+                OPENVRML_THROW2(openvrml::unsupported_interface, 
+                                std::bad_cast);
+
             openvrml::event_listener &
             do_event_listener(Node & node, const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface);
@@ -584,6 +605,10 @@ namespace openvrml {
             virtual const field_value & do_field(const std::string & id) const
                 OPENVRML_THROW1(unsupported_interface);
 
+            virtual void do_assign_field(const std::string & id,
+                                         const field_value &value) 
+                OPENVRML_THROW2(unsupported_interface, std::bad_cast);
+
             virtual openvrml::event_listener &
             do_event_listener(const std::string & id)
                 OPENVRML_THROW1(unsupported_interface);
@@ -678,6 +703,19 @@ namespace openvrml {
                 *polymorphic_downcast<const abstract_node_type *>(
                     &this->type());
             return type.field_value(*this, id);
+        }
+
+        template <typename Derived>
+        void
+        abstract_node<Derived>::do_assign_field(const std::string & id,
+                                                const field_value &value) 
+            OPENVRML_THROW2(unsupported_interface, std::bad_cast)
+        {
+            using boost::polymorphic_downcast;
+            const abstract_node_type & type =
+                *polymorphic_downcast<const abstract_node_type *>(
+                    &this->type());
+            return type.assign_field_value(*this, id, value);
         }
 
         template <typename Derived>
@@ -1063,6 +1101,21 @@ namespace openvrml {
         }
 
         template <typename Node>
+        void
+        node_type_impl<Node>::assign_field_value(
+            openvrml::node & node,
+            const std::string & id,
+            const openvrml::field_value &value) const
+            OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
+        {
+            assert(dynamic_cast<Node *>(&node));
+            return 
+                this->do_assign_field_value( 
+                    dynamic_cast<Node &>(node), id, value
+                );
+        }
+
+        template <typename Node>
         const openvrml::field_value &
         node_type_impl<Node>::
         do_field_value(const Node & node, const std::string & id) const
@@ -1078,6 +1131,27 @@ namespace openvrml {
                                             id);
             }
             return itr->second->deref(node);
+        }
+
+        template <typename Node>
+        void
+        node_type_impl<Node>::
+        do_assign_field_value(Node & node, 
+                              const std::string & id,
+                              const openvrml::field_value &value) const
+            OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
+        {
+            using namespace openvrml;
+
+            const typename field_value_map_t::const_iterator field =
+                this->field_value_map.find(id);
+            if (field == this->field_value_map.end()) {
+                throw unsupported_interface(*this,
+                                            node_interface::field_id,
+                                            id);
+            }
+            
+            field->second->deref(node).assign(value);
         }
 
         template <typename Node>

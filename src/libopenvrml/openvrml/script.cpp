@@ -2305,6 +2305,14 @@ openvrml::script_node::do_field(const std::string & id) const
     throw unsupported_interface(this->type_, node_interface::field_id, id);
 }
 
+void
+openvrml::script_node::do_assign_field(const std::string & id,
+                                       const field_value &value) 
+    OPENVRML_THROW2(unsupported_interface, std::bad_cast)
+{
+    throw unsupported_interface(this->type_, node_interface::field_id, id);
+}
+
 /**
  * @brief Get an event listener.
  *

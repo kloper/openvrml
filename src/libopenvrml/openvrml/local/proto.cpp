@@ -165,6 +165,10 @@ namespace openvrml {
             virtual
             const openvrml::field_value & do_field(const std::string & id) const
                 OPENVRML_THROW1(openvrml::unsupported_interface);
+            virtual void do_assign_field(const std::string & id,
+                                        const openvrml::field_value &value) 
+                OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast);
+
             virtual openvrml::event_listener &
                 do_event_listener(const std::string & id)
                 OPENVRML_THROW1(openvrml::unsupported_interface);
@@ -1367,6 +1371,14 @@ do_field(const std::string & id) const
         }
         return *default_value->second;
     }
+}
+
+void
+openvrml::local::proto_node::
+do_assign_field(const std::string & id, const openvrml::field_value &value) 
+    OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
+{
+    throw unsupported_interface(this->type(), id);
 }
 
 /**

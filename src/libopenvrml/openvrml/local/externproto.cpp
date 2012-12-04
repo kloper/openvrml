@@ -587,6 +587,17 @@ openvrml::local::externproto_node::do_field(const std::string & id) const
     return *pos->second;
 }
 
+void
+openvrml::local::externproto_node::do_assign_field(
+    const std::string & id,
+    const openvrml::field_value &value) 
+    OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast)
+{
+    throw unsupported_interface(this->type(),
+                                node_interface::field_id,
+                                id);
+}
+
 openvrml::event_listener &
 openvrml::local::externproto_node::do_event_listener(const std::string & id)
     OPENVRML_THROW1(unsupported_interface)

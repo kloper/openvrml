@@ -1438,6 +1438,10 @@ namespace {
         virtual const openvrml::field_value &
         do_field(const std::string & id) const
             OPENVRML_THROW1(openvrml::unsupported_interface);
+        virtual void
+            do_assign_field(const std::string & id, 
+                            const openvrml::field_value &value) 
+            OPENVRML_THROW2(openvrml::unsupported_interface, std::bad_cast);
         virtual openvrml::event_listener &
         do_event_listener(const std::string & id)
             OPENVRML_THROW1(openvrml::unsupported_interface);
@@ -1466,6 +1470,13 @@ namespace {
     {
         static const openvrml::sfbool val;
         return val;
+    }
+
+    void
+    self_ref_node::do_assign_field(const std::string &id, 
+                                   const openvrml::field_value &value) 
+        OPENVRML_THROW1(openvrml::unsupported_interface)
+    {
     }
 
     class OPENVRML_LOCAL dummy_listener : public openvrml::sfbool_listener {
@@ -1889,6 +1900,13 @@ openvrml::node::field(const std::string & id) const
     OPENVRML_THROW2(unsupported_interface, std::bad_alloc)
 {
     return this->do_field(id).clone();
+}
+
+void
+openvrml::node::assign_field(const std::string & id, const field_value &value ) 
+    OPENVRML_THROW2(unsupported_interface, std::bad_cast)
+{
+    return this->do_assign_field(id, value);
 }
 
 /**
