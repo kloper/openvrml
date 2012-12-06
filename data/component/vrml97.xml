@@ -451,6 +451,7 @@
       <field id="jump"        type="SFBool"     access-type="inputOutput" />
       <field id="orientation" type="SFRotation" access-type="inputOutput" />
       <field id="position"    type="SFVec3f"    access-type="inputOutput" />
+      <field id="centerOfRotation" type="SFVec3f" access-type="inputOutput" />
       <field id="description" type="SFString"   access-type="initializeOnly" />
       <field id="bindTime"    type="SFTime"     access-type="outputOnly" />
       <field id="isBound"     type="SFBool"     access-type="outputOnly" />

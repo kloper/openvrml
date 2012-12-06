@@ -754,13 +754,14 @@ void openvrml_node_vrml97::viewpoint_node::update_final_transformation() const
     if (this->final_transformation_dirty) {
         static const vec3f scale = make_vec3f(1.0, 1.0, 1.0);
         static const rotation scaleOrientation = make_rotation();
-        static const vec3f center = make_vec3f();
         const mat4f & t =
-            make_transformation_mat4f(this->position_.sfvec3f::value(),
-                                      this->orientation_.sfrotation::value(),
-                                      scale,
-                                      scaleOrientation,
-                                      center);
+            make_transformation_mat4f(
+                this->position_.sfvec3f::value(),
+                this->orientation_.sfrotation::value(),
+                scale,
+                scaleOrientation,
+                this->center_of_rotation_.sfvec3f::value()
+            );
         this->final_transformation = t * this->parent_transform;
         this->final_transformation_dirty = false;
     }
