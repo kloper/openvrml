@@ -377,8 +377,10 @@ namespace {
                 }
             }
 
-            float max_x = this->x_spacing_.value() * this->x_dimension_.value();
-            float max_z = this->z_spacing_.value() * this->z_dimension_.value();
+            float max_x = this->x_spacing_.value() * 
+                          (this->x_dimension_.value()-1);
+            float max_z = this->z_spacing_.value() * 
+                          (this->z_dimension_.value()-1);
 
             openvrml::vec3f bottom = 
                 openvrml::make_vec3f( 0, y_defined ? min_y : 0, 0 );
