@@ -471,6 +471,7 @@ do_intersect_frustum(const openvrml::frustum & frustum) const
 void openvrml::bounding_sphere::do_extend(const vec3f & p)
 {
     using openvrml::local::fequal;
+    using openvrml::local::fless_equal;
 
     if (this->maximized()) { return; }
 
@@ -484,40 +485,13 @@ void openvrml::bounding_sphere::do_extend(const vec3f & p)
         return;
     }
 
-    // you know, we could probably just call extend(sphere) with a
-    // radius of zero and it would work out the same.
-
-    float x0 = this->center_.x();
-    float y0 = this->center_.y();
-    float z0 = this->center_.z();
-    float r0 = this->radius_;
-
-    float x1 = p.x();
-    float y1 = p.y();
-    float z1 = p.z();
-
-    float xn = x1 - x0;
-    float yn = y1 - y0;
-    float zn = z1 - z0;
-    float dn = float(sqrt(xn * xn + yn * yn + zn * zn));
-
-    if (fequal(dn, 0.0f)) { return; }
-
-    if (dn < r0) {
-        // point is inside sphere
+    if( fless_equal((p - this->center_).length(), this->radius_) )
         return;
-    }
 
-    float cr = float((dn + r0) / 2.0);
-    float tmp = (cr - r0) / dn;
-    float cx = x0 + xn * tmp;
-    float cy = y0 + yn * tmp;
-    float cz = z0 + zn * tmp;
-
-    this->radius_ = cr;
-    this->center_.x(cx);
-    this->center_.y(cy);
-    this->center_.z(cz);
+    vec3f opposite = this->center_ +
+                     (this->center_ - p).normalize() * this->radius_;
+    this->center_ = (opposite + p) * 0.5;
+    this->radius_ = (this->center_ - opposite).length();
 }
 
 /**
@@ -559,42 +533,15 @@ void openvrml::bounding_sphere::do_extend(const bounding_sphere & b)
         return;
     }
 
-    // s0 = ((x0,y0,z0),r0)
-    // s1 = ((x1,y1,z1),r1)
+    vec3f delta = b.center_ - this->center_;
+    float len = delta.length();
 
-    float x0 = this->center_.x();
-    float y0 = this->center_.y();
-    float z0 = this->center_.z();
-    float r0 = this->radius_;
-
-    float x1 = b.center_.x();
-    float y1 = b.center_.y();
-    float z1 = b.center_.z();
-    float r1 = b.radius_;
-
-    float xn = x1 - x0;
-    float yn = y1 - y0;
-    float zn = z1 - z0;
-    float dn = float(sqrt(xn * xn + yn * yn + zn * zn));
-
-    if (fequal(dn, 0.0f)) { return; }
-
-    if (dn + r1 < r0) { // inside us, so no change
-        return;
+    if( fequal( len, 0.0f ) ) {
+        this->radius_ = std::max( b.radius_, this->radius_ );        
+    } else {
+        vec3f zenith = b.center_ + delta / len * b.radius_;
+        extend(zenith);
     }
-    if (dn + r0 < r1) { // we're inside them...
-        *this = b;
-        return;
-    }
-
-    float cr = float((dn + r0 + r1) / 2.0);
-    float tmp = (cr - r0) / dn;
-    float cx = x0 + xn * tmp;
-    float cy = y0 + yn * tmp;
-    float cz = z0 + zn * tmp;
-
-    this->radius_ = cr;
-    this->center_ = make_vec3f(cx, cy, cz);
 }
 
 /**
