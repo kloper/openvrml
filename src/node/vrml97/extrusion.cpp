@@ -101,12 +101,15 @@ namespace {
         openvrml::sfbool solid_;
         openvrml::mfvec3f spine_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         extrusion_node(const openvrml::node_type & type,
                        const boost::shared_ptr<openvrml::scope> & scope);
         virtual ~extrusion_node() OPENVRML_NOTHROW;
 
     private:
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
         virtual void do_render_geometry(openvrml::viewer & viewer,
                                         openvrml::rendering_context context);
     };
@@ -463,7 +466,9 @@ namespace {
         solid_(true),
         spine_(std::vector<openvrml::vec3f>(extrusionDefaultSpine_,
                                             extrusionDefaultSpine_ + 2))
-    {}
+    {
+        this->bounding_volume_dirty(true); // lazy calc of bvolume
+    }
 
     /**
      * @brief Destroy.
@@ -498,6 +503,89 @@ namespace {
                                this->scale_.value());
         }
     }
+
+    /**
+     * @brief Get the bounding volume.
+     *
+     * @return the bounding volume associated with the node.
+     */
+    const openvrml::bounding_volume &
+    extrusion_node::do_bounding_volume() const
+    {
+        using namespace openvrml;
+        if (!this->bounding_volume_dirty()) 
+            return this->bsphere;
+
+        const std::vector<vec3f>& spine = this->spine_.value(); 
+        const std::vector<vec2f>& csection = this->cross_section_.value(); 
+        const std::vector<vec2f>& scale = this->scale_.value(); 
+        const std::vector<rotation>& orientation = this->orientation_.value(); 
+
+        if( spine.size() == 0 || csection.size() <= 1 ) 
+            return this->bsphere;
+
+        vec3f csection_top = 
+            make_vec3f(csection.front().x(), 0, csection.front().y());
+        vec3f csection_bottom = 
+            make_vec3f(csection.front().x(), 0, csection.front().y());
+
+        for( std::vector<vec2f>::const_iterator iter = csection.begin();
+             iter != csection.end();
+             ++iter ) {
+            if(csection_top.x() < iter->x())    csection_top.x(iter->x());
+            if(csection_top.z() < iter->y())    csection_top.z(iter->y());
+            if(csection_bottom.x() > iter->x()) csection_bottom.x(iter->x());
+            if(csection_bottom.z() > iter->y()) csection_bottom.z(iter->y());
+        }
+
+        unsigned int spine_index = 0;
+        bool bvolume_initialized = false;
+
+        for( std::vector<vec3f>::const_iterator iter = spine.begin();
+             iter != spine.end();
+             ++iter, ++spine_index ) {
+            const vec2f& scale_factor = scale[ spine_index % scale.size() ];
+            const rotation& orientation_factor = 
+                orientation[ spine_index % orientation.size() ];
+
+            mat4f scale_matrix = make_scale_mat4f( 
+                make_vec3f( scale_factor.x(), 1, scale_factor.y() )
+            );
+
+            mat4f spine_translation = make_translation_mat4f( *iter );
+            mat4f adjust_rotation = make_rotation_mat4f(orientation_factor);
+
+            mat4f final_transform = scale_matrix * 
+                                    adjust_rotation *
+                                    spine_translation;
+
+            vec3f top = csection_top * final_transform;
+            vec3f bottom = csection_bottom * final_transform;
+
+            bounding_sphere spine_bound;
+            spine_bound.center(*iter);
+            if( (top - *iter).length() > (bottom - *iter).length()) 
+                spine_bound.radius((top - *iter).length());
+            else
+                spine_bound.radius((bottom - *iter).length());
+                    
+            if( !bvolume_initialized ) {
+                const_cast<extrusion_node *>(this)-> 
+                    bsphere.radius(spine_bound.radius());
+                const_cast<extrusion_node *>(this)->
+                    bsphere.center(spine_bound.center()); 
+                bvolume_initialized = true;
+            } else {
+                const_cast<extrusion_node *>(this)->
+                    bsphere.extend(spine_bound);
+            }
+        }
+
+        const_cast<extrusion_node *>(this)->bounding_volume_dirty(false); 
+
+        return this->bsphere;
+    }
+
 }
 
 
