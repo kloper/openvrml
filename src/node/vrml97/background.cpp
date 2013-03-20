@@ -182,68 +182,6 @@ do_initialize(openvrml::viewpoint_node *, const double timestamp)
     }
 }
 
-/**
- * @brief @c node_metatype%-specific rendering.
- *
- * Render the active Background node.
- *
- * @param v viewer.
- */
-void
-openvrml_node_vrml97::background_metatype::
-do_render(openvrml::viewer & v) const
-    OPENVRML_NOTHROW
-{
-    using namespace openvrml;
-
-    if (this->bound_nodes.empty()) {
-        //
-        // Default background.
-        //
-        static const boost::shared_ptr<openvrml::scope> null_scope_ptr;
-        static const background_node
-            default_background(this->default_background_node_type_,
-                               null_scope_ptr);
-        v.insert_background(default_background);
-    } else {
-        assert(this->bound_nodes.top());
-        background_node & background = *this->bound_nodes.top();
-
-        // Background isn't selectable, so don't waste the time.
-        if (v.mode() == viewer::pick_mode) { return; }
-
-        if (background.modified()) {
-            v.remove_object(background);
-
-            //
-            // This could be a bit more surgical; but for now don't bother.
-            //
-            if (background.front()) {
-                v.remove_texture_object(*background.front());
-            }
-            if (background.back()) {
-                v.remove_texture_object(*background.back());
-            }
-            if (background.left()) {
-                v.remove_texture_object(*background.left());
-            }
-            if (background.right()) {
-                v.remove_texture_object(*background.right());
-            }
-            if (background.top()) {
-                v.remove_texture_object(*background.top());
-            }
-            if (background.bottom()) {
-                v.remove_texture_object(*background.bottom());
-            }
-        }
-
-        v.insert_background(background);
-
-        background.modified(false);
-    }
-}
-
 # define BACKGROUND_INTERFACE_SEQ                                 \
     ((eventin,      sfbool,   "set_bind",    set_bind_listener_)) \
     ((exposedfield, mffloat,  "groundAngle", ground_angle_))      \
@@ -530,34 +468,36 @@ background_node(const openvrml::node_type & type,
     using openvrml::node_cast;
     using openvrml::texture_node;
 
+    this->bounding_volume_dirty(true); // lazy calc of bvolume
+
     const boost::shared_ptr<openvrml::node_type> image_texture_type =
         scope->find_type("ImageTexture");
     assert(image_texture_type);
 
-    this->front_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    this->back_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    this->left_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    this->right_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    this->top_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    this->bottom_ =
-        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->front_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->back_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->left_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->right_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->top_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    // this->bottom_ =
+    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
 
-    //
-    // We could make this more (space) efficient if we let background_node
-    // know more about image_texture_node's internals.  But it's probably okay
-    // if background_node is a little heavy.
-    //
-    this->front_url_.add(this->front_->event_listener<mfstring>("url"));
-    this->back_url_.add(this->back_->event_listener<mfstring>("url"));
-    this->left_url_.add(this->left_->event_listener<mfstring>("url"));
-    this->right_url_.add(this->right_->event_listener<mfstring>("url"));
-    this->top_url_.add(this->top_->event_listener<mfstring>("url"));
-    this->bottom_url_.add(this->bottom_->event_listener<mfstring>("url"));
+    // //
+    // // We could make this more (space) efficient if we let background_node
+    // // know more about image_texture_node's internals.  But it's probably okay
+    // // if background_node is a little heavy.
+    // //
+    // this->front_url_.add(this->front_->event_listener<mfstring>("url"));
+    // this->back_url_.add(this->back_->event_listener<mfstring>("url"));
+    // this->left_url_.add(this->left_->event_listener<mfstring>("url"));
+    // this->right_url_.add(this->right_->event_listener<mfstring>("url"));
+    // this->top_url_.add(this->top_->event_listener<mfstring>("url"));
+    // this->bottom_url_.add(this->bottom_->event_listener<mfstring>("url"));
 }
 
 /**
@@ -609,19 +549,19 @@ void
 openvrml_node_vrml97::background_node::do_initialize(const double timestamp)
     OPENVRML_NOTHROW
 {
-    set_url(*this->front_, this->front_url_, timestamp);
-    set_url(*this->back_, this->back_url_, timestamp);
-    set_url(*this->left_, this->left_url_, timestamp);
-    set_url(*this->right_, this->right_url_, timestamp);
-    set_url(*this->top_, this->top_url_, timestamp);
-    set_url(*this->bottom_, this->bottom_url_, timestamp);
+    // set_url(*this->front_, this->front_url_, timestamp);
+    // set_url(*this->back_, this->back_url_, timestamp);
+    // set_url(*this->left_, this->left_url_, timestamp);
+    // set_url(*this->right_, this->right_url_, timestamp);
+    // set_url(*this->top_, this->top_url_, timestamp);
+    // set_url(*this->bottom_, this->bottom_url_, timestamp);
 
-    this->front_->initialize(*this->scene(), timestamp);
-    this->back_->initialize(*this->scene(), timestamp);
-    this->left_->initialize(*this->scene(), timestamp);
-    this->right_->initialize(*this->scene(), timestamp);
-    this->top_->initialize(*this->scene(), timestamp);
-    this->bottom_->initialize(*this->scene(), timestamp);
+    // this->front_->initialize(*this->scene(), timestamp);
+    // this->back_->initialize(*this->scene(), timestamp);
+    // this->left_->initialize(*this->scene(), timestamp);
+    // this->right_->initialize(*this->scene(), timestamp);
+    // this->top_->initialize(*this->scene(), timestamp);
+    // this->bottom_->initialize(*this->scene(), timestamp);
 
     using boost::polymorphic_downcast;
     background_metatype & nodeClass =
@@ -770,4 +710,79 @@ openvrml::texture_node *
 openvrml_node_vrml97::background_node::do_bottom() const OPENVRML_NOTHROW
 {
     return this->bottom_.get();
+}
+
+/**
+ * @brief @c node_metatype%-specific rendering.
+ *
+ * Render the active Background node.
+ *
+ * @param v viewer.
+ */
+void
+openvrml_node_vrml97::background_node::do_render_child(
+    openvrml::viewer & v,
+    openvrml::rendering_context context
+)
+{
+    using namespace openvrml;
+
+    using boost::polymorphic_downcast;
+    background_metatype & metatype =
+        const_cast<background_metatype &>(
+            *polymorphic_downcast<const background_metatype *>(
+                &this->type().metatype()));
+
+    if( metatype.is_first(*this) )
+    {
+        // Background isn't selectable, so don't waste the time.
+        if (v.mode() == viewer::pick_mode) { return; }
+
+        if (this->modified()) {
+            v.remove_object(*this);
+
+            //
+            // This could be a bit more surgical; but for now don't bother.
+            //
+            if (this->front()) {
+                v.remove_texture_object(*this->front());
+            }
+            if (this->back()) {
+                v.remove_texture_object(*this->back());
+            }
+            if (this->left()) {
+                v.remove_texture_object(*this->left());
+            }
+            if (this->right()) {
+                v.remove_texture_object(*this->right());
+            }
+            if (this->top()) {
+                v.remove_texture_object(*this->top());
+            }
+            if (this->bottom()) {
+                v.remove_texture_object(*this->bottom());
+            }
+        }
+
+        v.insert_background(*this);
+
+        this->modified(false);
+    }
+}
+
+/**
+ * @brief Get the bounding volume.
+ *
+ * @return the bounding volume associated with the node.
+ */
+const openvrml::bounding_volume &
+openvrml_node_vrml97::background_node::do_bounding_volume() const
+{
+    if (this->bounding_volume_dirty()) {
+        const_cast<openvrml_node_vrml97::background_node *>(this)->
+            bsphere.maximize();
+        const_cast<openvrml_node_vrml97::background_node *>(this)->
+            bounding_volume_dirty(false);
+    }
+    return this->bsphere;
 }

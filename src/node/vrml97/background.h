@@ -54,7 +54,6 @@ namespace openvrml_node_vrml97 {
         virtual void
         do_initialize(openvrml::viewpoint_node * initial_viewpoint,
                       double timestamp) OPENVRML_NOTHROW;
-        virtual void do_render(openvrml::viewer & v) const OPENVRML_NOTHROW;
         virtual const boost::shared_ptr<openvrml::node_type>
         do_create_type(const std::string & id,
                        const openvrml::node_interface_set & interfaces) const
@@ -100,6 +99,8 @@ namespace openvrml_node_vrml97 {
         boost::intrusive_ptr<openvrml::texture_node> top_;
         boost::intrusive_ptr<openvrml::texture_node> bottom_;
 
+        openvrml::bounding_sphere bsphere;
+
     public:
         background_node(const openvrml::node_type & type,
                         const boost::shared_ptr<openvrml::scope> & scope);
@@ -127,5 +128,8 @@ namespace openvrml_node_vrml97 {
         virtual openvrml::texture_node * do_right() const OPENVRML_NOTHROW;
         virtual openvrml::texture_node * do_top() const OPENVRML_NOTHROW;
         virtual openvrml::texture_node * do_bottom() const OPENVRML_NOTHROW;
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
+        virtual void do_render_child(openvrml::viewer & v,
+                                     openvrml::rendering_context context);
     };
 }
