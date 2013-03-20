@@ -337,7 +337,8 @@ void openvrml::bounding_volume::transform(const mat4f & M)
  */
 openvrml::bounding_sphere::bounding_sphere():
     center_(make_vec3f()),
-    radius_(-1.0)
+    radius_(-1.0),
+    maximized_(false)
 {}
 
 /**
@@ -473,8 +474,6 @@ void openvrml::bounding_sphere::do_extend(const vec3f & p)
     using openvrml::local::fequal;
     using openvrml::local::fless_equal;
 
-    if (this->maximized()) { return; }
-
     // if this bsphere isn't set yet, then just do an assign. what's it
     // mean to have a zero radius bsphere? is that going to mess
     // anything up (iow, do we ever divide by radius?)
@@ -514,11 +513,8 @@ void openvrml::bounding_sphere::do_extend(const bounding_sphere & b)
 {
     using openvrml::local::fequal;
 
-    if (this->maximized()) { return; }
-
     if (b.maximized()) {
         this->maximize();
-        return;
     }
 
     // if the other bsphere isn't set, ignore it?
@@ -529,7 +525,8 @@ void openvrml::bounding_sphere::do_extend(const bounding_sphere & b)
     // assign.
     //
     if (this->radius_ == -1.0f) { // flag, not comparison
-        *this = b;
+        this->center_ = b.center_;
+        this->radius_ = b.radius_;
         return;
     }
 
@@ -660,8 +657,7 @@ void openvrml::bounding_sphere::radius(const float r)
  */
 void openvrml::bounding_sphere::do_maximize()
 {
-    this->radius_ = std::numeric_limits<float>::max();
-    this->center_ = make_vec3f(0.0, 0.0, 0.0);
+    this->maximized_ = true;
 }
 
 /**
@@ -672,8 +668,7 @@ void openvrml::bounding_sphere::do_maximize()
  */
 bool openvrml::bounding_sphere::do_maximized() const
 {
-    if (this->radius_ == std::numeric_limits<float>::max()) { return true; }
-    return false;
+    return this->maximized_;
 }
 
 /**
@@ -683,7 +678,6 @@ bool openvrml::bounding_sphere::do_maximized() const
  */
 void openvrml::bounding_sphere::do_ortho_transform(const mat4f & t)
 {
-    if (this->maximized()) { return; }
     if (this->radius_ == -1) { return; }
     // ortho is easy: since we know it's uniform scaling, we can just
     // scale the radius and translate the center, and we're done.
@@ -701,7 +695,6 @@ void openvrml::bounding_sphere::do_ortho_transform(const mat4f & t)
  */
 void openvrml::bounding_sphere::do_transform(const mat4f & t)
 {
-    if (this->maximized()) { return; }
     if (this->radius_ == -1) { return; }
     this->center_ *= t;
 

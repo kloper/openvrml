@@ -87,6 +87,9 @@ namespace openvrml {
         virtual void do_enclose(const std::vector<vec3f> & points);
         virtual void do_ortho_transform(const mat4f & t);
         virtual void do_transform(const mat4f & t);
+
+    private:
+        bool maximized_;
     };
 
 
