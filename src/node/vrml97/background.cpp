@@ -474,30 +474,30 @@ background_node(const openvrml::node_type & type,
         scope->find_type("ImageTexture");
     assert(image_texture_type);
 
-    // this->front_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    // this->back_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    // this->left_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    // this->right_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    // this->top_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
-    // this->bottom_ =
-    //     node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->front_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->back_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->left_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->right_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->top_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
+    this->bottom_ =
+        node_cast<texture_node *>(image_texture_type->create_node(scope).get());
 
-    // //
-    // // We could make this more (space) efficient if we let background_node
-    // // know more about image_texture_node's internals.  But it's probably okay
-    // // if background_node is a little heavy.
-    // //
-    // this->front_url_.add(this->front_->event_listener<mfstring>("url"));
-    // this->back_url_.add(this->back_->event_listener<mfstring>("url"));
-    // this->left_url_.add(this->left_->event_listener<mfstring>("url"));
-    // this->right_url_.add(this->right_->event_listener<mfstring>("url"));
-    // this->top_url_.add(this->top_->event_listener<mfstring>("url"));
-    // this->bottom_url_.add(this->bottom_->event_listener<mfstring>("url"));
+    //
+    // We could make this more (space) efficient if we let background_node
+    // know more about image_texture_node's internals.  But it's probably okay
+    // if background_node is a little heavy.
+    //
+    this->front_url_.add(this->front_->event_listener<mfstring>("url"));
+    this->back_url_.add(this->back_->event_listener<mfstring>("url"));
+    this->left_url_.add(this->left_->event_listener<mfstring>("url"));
+    this->right_url_.add(this->right_->event_listener<mfstring>("url"));
+    this->top_url_.add(this->top_->event_listener<mfstring>("url"));
+    this->bottom_url_.add(this->bottom_->event_listener<mfstring>("url"));
 }
 
 /**
@@ -549,19 +549,34 @@ void
 openvrml_node_vrml97::background_node::do_initialize(const double timestamp)
     OPENVRML_NOTHROW
 {
-    // set_url(*this->front_, this->front_url_, timestamp);
-    // set_url(*this->back_, this->back_url_, timestamp);
-    // set_url(*this->left_, this->left_url_, timestamp);
-    // set_url(*this->right_, this->right_url_, timestamp);
-    // set_url(*this->top_, this->top_url_, timestamp);
-    // set_url(*this->bottom_, this->bottom_url_, timestamp);
+    openvrml::sfbool false_bool;
 
-    // this->front_->initialize(*this->scene(), timestamp);
-    // this->back_->initialize(*this->scene(), timestamp);
-    // this->left_->initialize(*this->scene(), timestamp);
-    // this->right_->initialize(*this->scene(), timestamp);
-    // this->top_->initialize(*this->scene(), timestamp);
-    // this->bottom_->initialize(*this->scene(), timestamp);
+    this->front_->assign_field("repeatS", false_bool);
+    this->front_->assign_field("repeatT", false_bool);
+    this->back_->assign_field("repeatS", false_bool);
+    this->back_->assign_field("repeatT", false_bool);
+    this->left_->assign_field("repeatS", false_bool);
+    this->left_->assign_field("repeatT", false_bool);
+    this->right_->assign_field("repeatS", false_bool);
+    this->right_->assign_field("repeatT", false_bool);
+    this->top_->assign_field("repeatS", false_bool);
+    this->top_->assign_field("repeatT", false_bool);
+    this->bottom_->assign_field("repeatS", false_bool);
+    this->bottom_->assign_field("repeatT", false_bool);
+
+    set_url(*this->front_, this->front_url_, timestamp);
+    set_url(*this->back_, this->back_url_, timestamp);
+    set_url(*this->left_, this->left_url_, timestamp);
+    set_url(*this->right_, this->right_url_, timestamp);
+    set_url(*this->top_, this->top_url_, timestamp);
+    set_url(*this->bottom_, this->bottom_url_, timestamp);
+
+    this->front_->initialize(*this->scene(), timestamp);
+    this->back_->initialize(*this->scene(), timestamp);
+    this->left_->initialize(*this->scene(), timestamp);
+    this->right_->initialize(*this->scene(), timestamp);
+    this->top_->initialize(*this->scene(), timestamp);
+    this->bottom_->initialize(*this->scene(), timestamp);
 
     using boost::polymorphic_downcast;
     background_metatype & nodeClass =
@@ -594,11 +609,11 @@ openvrml_node_vrml97::background_node::do_shutdown(const double timestamp)
 bool openvrml_node_vrml97::background_node::do_modified() const
     OPENVRML_THROW1(boost::thread_resource_error)
 {
-    return (this->front_ && this->front_->modified())
-        || (this->back_ && this->back_->modified())
-        || (this->left_ && this->left_->modified())
-        || (this->right_ && this->right_->modified())
-        || (this->top_ && this->top_->modified())
+    return (this->front_  && this->front_->modified())
+        || (this->back_   && this->back_->modified())
+        || (this->left_   && this->left_->modified())
+        || (this->right_  && this->right_->modified())
+        || (this->top_    && this->top_->modified())
         || (this->bottom_ && this->bottom_->modified());
 }
 
