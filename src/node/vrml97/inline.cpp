@@ -62,6 +62,7 @@ namespace {
             do_children() const OPENVRML_THROW1(std::bad_alloc);
 
         void load();
+        void do_shutdown(const double timestamp) OPENVRML_NOTHROW;
     };
 
     /**
@@ -250,6 +251,16 @@ namespace {
             load_inline_scene(*this->inline_scene_,
                               this->url_.mfstring::value());
         this->load_inline_scene_thread_.reset(new boost::thread(f));
+    }
+
+    void inline_node::do_shutdown(const double timestamp) OPENVRML_NOTHROW
+    {
+        if (this->load_inline_scene_thread_) {
+            this->load_inline_scene_thread_->join();
+        }
+
+        if( this->inline_scene_ != NULL )
+            this->inline_scene_->shutdown(timestamp);
     }
 }
 
