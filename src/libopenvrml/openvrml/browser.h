@@ -344,7 +344,7 @@ namespace openvrml {
 
         bool update(double current_time = -1.0);
 
-        void render();
+        void render(rendering_context &context);
 
         void modified(bool value);
         bool modified() const;

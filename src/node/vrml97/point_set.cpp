@@ -144,16 +144,6 @@ namespace {
         using openvrml::node_cast;
         using openvrml::vec3f;
 
-        if (context.draw_bounding_spheres) {
-            using boost::polymorphic_downcast;
-            using openvrml::bounding_sphere;
-            using openvrml::bounding_volume;
-            const bounding_sphere & bs =
-                *polymorphic_downcast<const bounding_sphere *>(
-                    &this->bounding_volume());
-            viewer.draw_bounding_sphere(bs, bounding_volume::intersection(4));
-        }
-
         openvrml::coordinate_node * const coordinateNode =
             node_cast<openvrml::coordinate_node *>(
                 this->coord_.sfnode::value().get());

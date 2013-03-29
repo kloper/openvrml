@@ -487,9 +487,6 @@ namespace openvrml_node_vrml97 {
             bv_copy.transform(context.matrix());
             bounding_volume::intersection r =
                 viewer.intersect_view_volume(bv_copy);
-            if (context.draw_bounding_spheres) {
-                viewer.draw_bounding_sphere(bs, r);
-            }
             if (r == bounding_volume::outside) { return; }
             if (r == bounding_volume::inside) {
                 context.cull_flag = bounding_volume::inside;

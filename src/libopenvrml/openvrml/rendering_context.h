@@ -25,12 +25,15 @@
 
 namespace openvrml {
 
+class node;
+
     class OPENVRML_API rendering_context {
         mat4f * modelview;
 
     public:
         bounding_volume::intersection cull_flag;
         bool draw_bounding_spheres;
+        const node *bounding_sphere_target;
 
         rendering_context();
         rendering_context(bounding_volume::intersection cull_flag,

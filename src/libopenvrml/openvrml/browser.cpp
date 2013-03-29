@@ -2362,7 +2362,7 @@ bool openvrml::browser::headlight_on()
 /**
  * @brief Draw this @c browser into the specified @c viewer
  */
-void openvrml::browser::render()
+void openvrml::browser::render(openvrml::rendering_context &context)
 {
     using boost::shared_lock;
     using boost::shared_mutex;
@@ -2424,9 +2424,8 @@ void openvrml::browser::render()
     // Top level object
 
     this->viewer_->begin_object(0);
-    mat4f modelview = t.inverse();
-    rendering_context rc(bounding_volume::partial, modelview);
-    rc.draw_bounding_spheres = true;
+    mat4f modelview = t.inverse() * context.matrix();
+    context.matrix( modelview );
 
     // Do the browser-level lights (Points and Spots)
     {
@@ -2443,7 +2442,7 @@ void openvrml::browser::render()
     // Render the nodes.  scene_ may be 0 if the world failed to load.
     //
     if (this->scene_) {
-        this->scene_->render(*this->viewer_, rc);
+        this->scene_->render(*this->viewer_, context);
     }
 
     this->viewer_->end_object();

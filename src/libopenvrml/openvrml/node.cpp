@@ -3321,6 +3321,21 @@ void openvrml::child_node::render_child(viewer & v,
     shared_lock<shared_mutex> lock(this->scene_mutex());
     if (this->scene()) {
         this->do_render_child(v, context);
+
+        if (context.draw_bounding_spheres && 
+            this == dynamic_cast<const openvrml::node*>(
+                context.bounding_sphere_target
+            ) 
+        ) {
+            using boost::polymorphic_downcast;
+            const openvrml::bounding_sphere *bs =
+                polymorphic_downcast<const openvrml::bounding_sphere *>(
+                    &this->bounding_volume()
+                );
+            if( bs != NULL )
+                v.draw_bounding_sphere(*bs, context.cull_flag);
+        }
+
         this->modified(false);
     }
 }

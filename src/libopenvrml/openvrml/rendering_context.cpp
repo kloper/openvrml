@@ -114,7 +114,8 @@
 openvrml::rendering_context::rendering_context():
     modelview(0),
     cull_flag(bounding_volume::partial),
-    draw_bounding_spheres(false)
+    draw_bounding_spheres(false),
+    bounding_sphere_target(NULL)
 {}
 
 /**
@@ -133,7 +134,8 @@ openvrml::rendering_context::rendering_context(
     mat4f & modelview):
     modelview(&modelview),
     cull_flag(cull_flag),
-    draw_bounding_spheres(false)
+    draw_bounding_spheres(false),
+    bounding_sphere_target(NULL)
 {}
 
 /**
