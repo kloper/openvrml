@@ -49,6 +49,9 @@ namespace openvrml {
 
         boost::thread_group stream_reader_threads_;
 
+        mutable boost::shared_mutex bsphere_mutex_;
+        openvrml::bounding_sphere bsphere_;
+        
     public:
         explicit scene(openvrml::browser & browser, scene * parent = 0)
             OPENVRML_NOTHROW;
@@ -68,6 +71,7 @@ namespace openvrml {
             OPENVRML_THROW1(std::bad_alloc);
         void nodes(const std::vector<boost::intrusive_ptr<node> > & n)
             OPENVRML_THROW2(std::invalid_argument, std::bad_alloc);
+        const openvrml::bounding_volume & bounding_volume() const;
         const scope * root_scope() const OPENVRML_NOTHROW;
         const std::string url() const OPENVRML_THROW1(std::bad_alloc);
         void render(openvrml::viewer & viewer, rendering_context context);

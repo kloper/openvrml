@@ -346,6 +346,37 @@ void openvrml::scene::nodes(const std::vector<boost::intrusive_ptr<node> > & n)
     this->nodes_ = n;
 }
 
+const openvrml::bounding_volume& 
+openvrml::scene::bounding_volume() const
+{
+    using boost::unique_lock;
+    using boost::shared_mutex;
+
+    typedef std::vector<boost::intrusive_ptr<openvrml::node> > nodes_vec_t;
+    typedef nodes_vec_t::const_iterator nodes_vec_citer_t;
+
+    unique_lock<shared_mutex> lock(this->bsphere_mutex_);
+    const_cast<scene*>(this)->bsphere_ = openvrml::bounding_sphere();
+
+    nodes_vec_t nodes = this->nodes();
+    for( nodes_vec_citer_t iter = nodes.begin(); iter != nodes.end(); ++iter )
+    {
+        const openvrml::bounded_volume_node* node = 
+            dynamic_cast<const openvrml::bounded_volume_node*>(iter->get());
+        if( node != NULL ) {
+            const openvrml::bounding_sphere *bs = 
+                dynamic_cast<const openvrml::bounding_sphere*>(
+                    &(node->bounding_volume())
+                );
+            if( bs != NULL ) {
+                const_cast<scene*>(this)->bsphere_.extend( *bs );
+            }
+        }
+    }
+
+    return this->bsphere_;
+}
+
 /**
  * @brief Get the root @c scope.
  *

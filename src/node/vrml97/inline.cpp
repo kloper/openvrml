@@ -50,12 +50,14 @@ namespace {
         bool loaded_;
         boost::scoped_ptr<boost::thread> load_inline_scene_thread_;
 
+        openvrml::bounding_sphere bsphere;
     public:
         inline_node(const openvrml::node_type & type,
                     const boost::shared_ptr<openvrml::scope> & scope);
         virtual ~inline_node() OPENVRML_NOTHROW;
 
     private:
+        virtual const openvrml::bounding_volume & do_bounding_volume() const;
         virtual void do_render_child(openvrml::viewer & viewer,
                                      openvrml::rendering_context context);
         virtual const std::vector<boost::intrusive_ptr<openvrml::node> >
@@ -150,7 +152,8 @@ namespace {
     void inline_node::do_render_child(openvrml::viewer & viewer,
                                       const openvrml::rendering_context context)
     {
-        this->load();
+        if (this->load_inline_scene_thread_ == NULL)
+            this->load();
         if (this->inline_scene_) { this->inline_scene_->render(viewer, context); }
     }
 
@@ -251,6 +254,18 @@ namespace {
             load_inline_scene(*this->inline_scene_,
                               this->url_.mfstring::value());
         this->load_inline_scene_thread_.reset(new boost::thread(f));
+    }
+
+    const openvrml::bounding_volume& inline_node::do_bounding_volume() const
+    {
+        if (this->load_inline_scene_thread_ == NULL)
+            const_cast<inline_node*>(this)->load();
+        this->load_inline_scene_thread_->join();
+
+        if( this->inline_scene_ != NULL )
+            return this->inline_scene_->bounding_volume();
+
+        return this->bsphere;
     }
 
     void inline_node::do_shutdown(const double timestamp) OPENVRML_NOTHROW
