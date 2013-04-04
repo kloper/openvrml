@@ -22,6 +22,7 @@
 
 # include <dgd.h>
 
+# include <openvrml/local/tracing.h>
 # include <openvrml/local/float.h>
 
 # include "bounding_volume.h"
@@ -382,7 +383,7 @@ openvrml::bounding_volume::intersection
 openvrml::bounding_sphere::
 do_intersect_frustum(const openvrml::frustum & frustum) const
 {
-    dgd_scope;
+    dgd_scopef(trace_openvrml);
 
     dgd_echo(this->radius_);
     dgd_echo(this->maximized());
