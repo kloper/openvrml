@@ -126,14 +126,6 @@ parse_vrml(std::istream & in,
     typedef multi_pass<istreambuf_iterator<char> > multi_pass_iterator_t;
     typedef istream::char_type char_t;
 
-    if(dgd::controller<char>::get() == NULL) {
-        std::vector<std::string> args;
-        args.push_back("openvrml");
-        args.push_back("--trace-log=openvrml.log");
-        args.push_back("--trace-max-width=200");
-        dgd::controller<char>::init(args);
-    }
-
     vrml97_skip_grammar skip_g;
 
     if (iequals(type, vrml_media_type) || iequals(type, x_vrml_media_type)) {
