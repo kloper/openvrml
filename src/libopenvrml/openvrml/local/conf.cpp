@@ -125,10 +125,17 @@ const boost::filesystem::path openvrml::local::conf::datadir()
     try {
         result = get_env("OPENVRML_DATADIR");
     } catch (const no_environment_var &) {
-# if defined(_WIN32) && !defined(OPENVRML_PKGDATADIR_)
+# if defined(_WIN32) 
+#  if !defined(OPENVRML_PKGDATADIR_)
         result = get_registry_setting("Datadir");
-# else
-        result = OPENVRML_PKGDATADIR_;
+#  else
+        char path[MAX_PATH];
+        GetModuleFileName(NULL, path, sizeof(path));
+        
+        boost::filesystem::path dll_path(path);
+        
+        result = dll_path.parent_path() / OPENVRML_PKGDATADIR_;
+#  endif
 # endif
     }
     return result;
@@ -193,12 +200,22 @@ const std::vector<boost::filesystem::path> openvrml::local::conf::node_path()
          back_inserter(result));
 
     std::string system_path;
-# if defined(_WIN32) && !defined(OPENVRML_PKGLIBDIR_)
+
+# if defined(_WIN32)
+#  if !defined(OPENVRML_PKGLIBDIR_)
     try {
         system_path = get_registry_setting("NodePath");
     } catch (no_registry_key &) {}
-# else
-    system_path = OPENVRML_PKGLIBDIR_ "/node";
+#  else
+    char path[MAX_PATH];
+    GetModuleFileName(NULL, path, sizeof(path));
+            
+    boost::filesystem::path dll_path(path);
+            
+    system_path = (dll_path.parent_path() / 
+                   OPENVRML_PKGDATADIR_ / 
+                   "node").string();
+#  endif
 # endif
 
     tokenizer_t system_path_tokenizer(system_path, tokenizer_func);
@@ -229,12 +246,21 @@ const std::vector<boost::filesystem::path> openvrml::local::conf::script_path()
          back_inserter(result));
 
     std::string system_path;
-# if defined(_WIN32) && !defined(OPENVRML_PKGLIBDIR_)
+# if defined(_WIN32)
+#  if !defined(OPENVRML_PKGLIBDIR_)
     try {
         system_path = get_registry_setting("ScriptPath");
     } catch (no_registry_key &) {}
-# else
-    system_path = OPENVRML_PKGLIBDIR_ "/script";
+#  else
+    char path[MAX_PATH];
+    GetModuleFileName(NULL, path, sizeof(path));
+            
+    boost::filesystem::path dll_path(path);
+            
+    system_path = (dll_path.parent_path() / 
+                   OPENVRML_PKGDATADIR_ / 
+                   "script").string();
+#  endif
 # endif
 
     tokenizer_t system_path_tokenizer(system_path, tokenizer_func);
